@@ -1,7 +1,8 @@
 import uuid
 
 from pydantic import EmailStr
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import Field, Enum, Relationship, SQLModel
+from datetime import datetime
 
 
 # Shared properties
@@ -57,23 +58,34 @@ class UsersPublic(SQLModel):
 
 
 # Shared properties
-class ItemBase(SQLModel):
-    title: str = Field(min_length=1, max_length=255)
+class EmotionImpact(str, enum.Enum):
+    xtreme_sad = "Extremely Sad"
+    sad = "Sad"
+    meh = "Ambivalent"
+    happy = "Happy"
+    xtreme_happy = "Extremely Happy"
+
+class PMOTBase(SQLModel):
+    label: str = Field(min_length=1, max_length=255)
     description: str | None = Field(default=None, max_length=255)
+    event_date: date = Field(default_factory=datetime.utcnow,nullable=False)
+    short_story: str = Field(min_length=1, max_length=5500)
+    emotional_impact: EmotionImpact = Field(sa_column = Column(Enum(EmotionImpact)))
+    #show_on_jl: bool = False
 
 
 # Properties to receive on item creation
-class ItemCreate(ItemBase):
-    title: str = Field(min_length=1, max_length=255)
+class ItemCreate(PMOTBase):
+    created_at: date = Field(default_factory=datetime.utcnow,nullable=False)
 
 
 # Properties to receive on item update
-class ItemUpdate(ItemBase):
+class ItemUpdate(PMOTBase):
     title: str | None = Field(default=None, min_length=1, max_length=255)  # type: ignore
 
 
 # Database model, database table inferred from class name
-class Item(ItemBase, table=True):
+class PMOT(PMOTBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     title: str = Field(max_length=255)
     owner_id: uuid.UUID = Field(
@@ -83,13 +95,13 @@ class Item(ItemBase, table=True):
 
 
 # Properties to return via API, id is always required
-class ItemPublic(ItemBase):
+class PMOTPublic(PMOTBase):
     id: uuid.UUID
     owner_id: uuid.UUID
 
 
 class ItemsPublic(SQLModel):
-    data: list[ItemPublic]
+    data: list[PMOTPublic]
     count: int
 
 
