@@ -1,8 +1,3 @@
-# Full Stack FastAPI Template
-
-<a href="https://github.com/fastapi/full-stack-fastapi-template/actions?query=workflow%3ATest" target="_blank"><img src="https://github.com/fastapi/full-stack-fastapi-template/workflows/Test/badge.svg" alt="Test"></a>
-<a href="https://coverage-badge.samuelcolvin.workers.dev/redirect/fastapi/full-stack-fastapi-template" target="_blank"><img src="https://coverage-badge.samuelcolvin.workers.dev/fastapi/full-stack-fastapi-template.svg" alt="Coverage"></a>
-
 ## Technology Stack and Features
 
 - ⚡ [**FastAPI**](https://fastapi.tiangolo.com) for the Python backend API.
@@ -234,6 +229,6 @@ This includes using Docker Compose, custom local domains, `.env` configurations,
 
 Check the file [release-notes.md](./release-notes.md).
 
-## License
-
-The Full Stack FastAPI Template is licensed under the terms of the MIT license.
+=======
+# personal-pmot
+personal pmot tool
