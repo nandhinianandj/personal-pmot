@@ -44,7 +44,8 @@ class UpdatePassword(SQLModel):
 class User(UserBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     hashed_password: str
-    items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
+    items: list["Item"] = Relationship(back_populates="owner", 
+                                       cascade_delete=True)
 
 
 # Properties to return via API, id is always required
@@ -73,7 +74,6 @@ class PMOTBase(SQLModel):
     emotional_impact: EmotionImpact = Field(sa_column = Column(Enum(EmotionImpact)))
     #show_on_jl: bool = False
 
-
 # Properties to receive on item creation
 class ItemCreate(PMOTBase):
     created_at: date = Field(default_factory=datetime.utcnow,nullable=False)
@@ -93,6 +93,14 @@ class PMOT(PMOTBase, table=True):
     )
     owner: User | None = Relationship(back_populates="items")
 
+class PMOTDetails(SQLModel, table=True):
+    pmot_id: uuid.UUID = Field(foreign_key="PMOT.id", nullable=False, ondelete="RESTRICT")
+    det_story: str = Field(min_length=1, max_length=5500)
+    story_arc: StoryArc = # story arc obj 
+    anchors : list[Anchor] = Relationship(back_populates="Anchor", 
+                                          cascade_delete=False)
+    empathy_matrix: EmpathyMatrix = empathy_mat_obj
+    strengths1: list[Strength] = list_of_strength_objs
 
 # Properties to return via API, id is always required
 class PMOTPublic(PMOTBase):
