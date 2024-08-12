@@ -74,6 +74,9 @@ class PMOTBase(SQLModel):
     emotional_impact: EmotionImpact = Field(sa_column = Column(Enum(EmotionImpact)))
     #show_on_jl: bool = False
 
+class Anchor(SQLModel):
+    pass
+
 # Properties to receive on item creation
 class ItemCreate(PMOTBase):
     created_at: date = Field(default_factory=datetime.utcnow,nullable=False)
