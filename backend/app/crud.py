@@ -5,7 +5,7 @@ from datetime import datetime
 from sqlmodel import Session, select
 
 from app.core.security import get_password_hash, verify_password
-from app.models import Item, ItemCreate, User, UserCreate, UserUpdate, PMOT, PMOTDetailsCreate, PMOTDetails
+from app.models import Item, ItemCreate, User, UserCreate, UserUpdate, PMOT, PMOTDetailsCreate, PMOTDetails, PMOTDetailsUpdate
 
 
 def create_user(*, session: Session, user_create: UserCreate) -> User:
@@ -87,3 +87,17 @@ def create_pmot_details(
     session.commit()
     session.refresh(db_pmot_details)
     return db_pmot_details
+
+def update_pmot_details(
+    *,
+    session: Session,
+    db_pmot_details: PMOTDetails,
+    pmot_details_in: PMOTDetailsUpdate
+) -> PMOTDetails:
+    update_data = pmot_details_in.model_dump(exclude_unset=True)
+    db_pmot_details.sqlmodel_update(update_data)
+    session.add(db_pmot_details)
+    session.commit()
+    session.refresh(db_pmot_details)
+    return db_pmot_details
+
