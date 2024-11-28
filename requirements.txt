@@ -6,3 +6,4 @@ python-jose
 passlib
 bcrypt
 uvicorn[standard]
+razorpay
