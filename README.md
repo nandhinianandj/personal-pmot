@@ -1,3 +1,14 @@
+## Thanks to [Bolt](https://bolt.new)
+    - and also all the shoulders of other giants(LLMs  being the youngest), they stand on for generating this with a couple of days of prompting and thinking and re-prompting minor bug fixing etc..
+    - Transformers and attention mechanisms 2nd youngest
+    - The DL revolution before that
+    - The underlying GPU disruption before that
+    - Statistical NLP(google's n-gram models, Hidden Markov models ) and probabilistic language models before that(Conditional Random fields, etc.. )
+    - Knowledge bases and Ontology centered approaches like [Opencog](https://github.com/opencog/opencog) before that
+    - Rule-based(aka heuristics based) systems before that
+    - Alan Turing for Turing test(and have to mention unfairly and induced to kill themselves too early for being themselves)
+    - And a lot more before these,(across so-called "other subjects/fields" , but gonna stop here for now)
+
 ## Technology Stack and Features
 
 - ⚡ [**FastAPI**](https://fastapi.tiangolo.com) for the Python backend API.
