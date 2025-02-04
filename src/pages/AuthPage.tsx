@@ -3,7 +3,6 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoginForm from '../components/auth/LoginForm';
 import RegisterForm from '../components/auth/RegisterForm';
-import GoogleSignInButton from '../components/auth/GoogleSignInButton';
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -25,21 +24,6 @@ export default function AuthPage() {
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           {isLogin ? <LoginForm /> : <RegisterForm />}
           
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Or continue with</span>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <GoogleSignInButton />
-            </div>
-          </div>
-
           <div className="mt-6">
             <button
               onClick={() => setIsLogin(!isLogin)}

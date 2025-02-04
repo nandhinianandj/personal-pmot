@@ -7,7 +7,6 @@ interface AuthContextType {
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
   register: (email: string, username: string, password: string) => Promise<void>;
-  loginWithGoogle: (token: string) => Promise<void>;
   isAuthenticated: boolean;
 }
 
@@ -50,21 +49,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const loginWithGoogle = async (token: string) => {
-    try {
-      const response = await axios.post('/api/auth/google', { token });
-      const { access_token } = response.data;
-      localStorage.setItem('token', access_token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-      
-      const decoded = jwtDecode(access_token);
-      setUser(decoded);
-      setIsAuthenticated(true);
-    } catch (error) {
-      throw new Error('Google login failed');
-    }
-  };
-
   const logout = () => {
     localStorage.removeItem('token');
     delete axios.defaults.headers.common['Authorization'];
@@ -86,8 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       user, 
       login, 
       logout, 
-      register, 
-      loginWithGoogle, 
+      register,
       isAuthenticated 
     }}>
       {children}

@@ -28,6 +28,10 @@ class StoryCreate(StoryBase):
 class Story(StoryBase):
     id: int
     author_id: int
+    remote_id: Optional[str] = None
+    remote_author: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
     media_links: List[MediaLink] = []
 
     class Config:
@@ -42,7 +46,11 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
-    is_premium: bool
+    actor_url: Optional[str] = None
+    inbox_url: Optional[str] = None
+    outbox_url: Optional[str] = None
+    followers_url: Optional[str] = None
+    following_url: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -54,22 +62,16 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     username: Optional[str] = None
 
-class PaymentVerification(BaseModel):
-    payment_id: str
-    order_id: str
-    signature: str
+class FollowCreate(BaseModel):
+    remote_actor: str
 
-class SubscriptionCreate(BaseModel):
-    plan_id: str
-    amount: float
-
-class Subscription(SubscriptionCreate):
+class Follow(BaseModel):
     id: int
-    user_id: int
-    status: str
-    start_date: datetime
-    end_date: datetime
-    payment_id: str
+    follower_id: int
+    following_id: Optional[int] = None
+    remote_actor: Optional[str] = None
+    accepted: bool
+    created_at: datetime
 
     class Config:
         from_attributes = True

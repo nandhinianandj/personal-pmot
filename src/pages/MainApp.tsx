@@ -3,7 +3,6 @@ import { useAuth } from '../contexts/AuthContext';
 import Layout from '../components/Layout';
 import StoryForm from '../components/StoryForm';
 import StoryCard from '../components/StoryCard';
-import PremiumUpgrade from '../components/premium/PremiumUpgrade';
 import Modal from '../components/Modal';
 import { useStories } from '../hooks/useStories';
 import { Story } from '../types';
@@ -11,7 +10,6 @@ import { PlusCircle } from 'lucide-react';
 
 export default function MainApp() {
   const { stories, isLoading, createStory, updateStory, deleteStory } = useStories();
-  const { user } = useAuth();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingStory, setEditingStory] = useState<Story | null>(null);
 
@@ -33,12 +31,6 @@ export default function MainApp() {
 
   return (
     <Layout>
-      {!user?.is_premium && (
-        <div className="mb-8">
-          <PremiumUpgrade />
-        </div>
-      )}
-
       <div className="flex justify-end mb-8">
         <button
           onClick={() => {
