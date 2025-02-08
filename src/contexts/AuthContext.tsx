@@ -1,67 +1,52 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
+import { User } from 'oidc-client-ts';
+import { authService } from '../services/AuthService';
+import { toast } from 'react-hot-toast';
 
 interface AuthContextType {
-  user: any;
-  login: (username: string, password: string) => Promise<void>;
-  logout: () => void;
-  register: (email: string, username: string, password: string) => Promise<void>;
+  user: User | null;
+  login: () => Promise<void>;
+  logout: () => Promise<void>;
   isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
+    const checkAuth = async () => {
       try {
-        const decoded = jwtDecode(token);
-        setUser(decoded);
-        setIsAuthenticated(true);
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        const user = await authService.getUser();
+        setUser(user);
+        setIsAuthenticated(!!user && !user.expired);
       } catch (error) {
-        localStorage.removeItem('token');
+        console.error('Auth check failed:', error);
       }
-    }
+    };
+
+    checkAuth();
   }, []);
 
-  const login = async (username: string, password: string) => {
+  const login = async () => {
     try {
-      const response = await axios.post('/api/token', new URLSearchParams({
-        username,
-        password,
-      }));
-      
-      const { access_token } = response.data;
-      localStorage.setItem('token', access_token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-      
-      const decoded = jwtDecode(access_token);
-      setUser(decoded);
-      setIsAuthenticated(true);
+      await authService.login();
     } catch (error) {
-      throw new Error('Login failed');
+      toast.error('Login failed');
+      throw error;
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    delete axios.defaults.headers.common['Authorization'];
-    setUser(null);
-    setIsAuthenticated(false);
-  };
-
-  const register = async (email: string, username: string, password: string) => {
+  const logout = async () => {
     try {
-      await axios.post('/api/users/', { email, username, password });
-      await login(username, password);
+      await authService.logout();
+      setUser(null);
+      setIsAuthenticated(false);
     } catch (error) {
-      throw new Error('Registration failed');
+      toast.error('Logout failed');
+      throw error;
     }
   };
 
@@ -69,8 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider value={{ 
       user, 
       login, 
-      logout, 
-      register,
+      logout,
       isAuthenticated 
     }}>
       {children}

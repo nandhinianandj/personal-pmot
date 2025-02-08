@@ -4,6 +4,7 @@ import Layout from '../components/Layout';
 import StoryForm from '../components/StoryForm';
 import StoryCard from '../components/StoryCard';
 import Modal from '../components/Modal';
+import ChatBox from '../components/ChatBox';
 import { useStories } from '../hooks/useStories';
 import { Story } from '../types';
 import { PlusCircle } from 'lucide-react';
@@ -75,6 +76,8 @@ export default function MainApp() {
           <p className="text-gray-500">No stories yet. Create your first story!</p>
         </div>
       )}
+
+      <ChatBox />
     </Layout>
   );
 }

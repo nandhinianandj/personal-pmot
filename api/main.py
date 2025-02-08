@@ -7,6 +7,7 @@ from datetime import timedelta
 from . import models, schemas, auth
 from .database import SessionLocal, engine
 from .activitypub import ActivityPubProtocol
+from .chat import router as chat_router
 import os
 import json
 from pathlib import Path
@@ -28,6 +29,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include chat router
+app.include_router(chat_router, prefix="/chat", tags=["chat"])
 
 # ActivityPub Endpoints
 @app.get("/users/{username}")
@@ -110,6 +114,3 @@ async def user_outbox(username: str, db: Session = Depends(auth.get_db)):
         "totalItems": len(activities),
         "orderedItems": activities
     }
-
-# Existing endpoints...
-# (Keep all the existing endpoints from the previous main.py)

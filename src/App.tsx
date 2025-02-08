@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import { useAuth } from './contexts/AuthContext';
 import AuthPage from './pages/AuthPage';
 import MainApp from './pages/MainApp';
+import CallbackPage from './pages/CallbackPage';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -16,6 +17,7 @@ export default function App() {
       <Toaster position="top-right" />
       <Routes>
         <Route path="/auth" element={<AuthPage />} />
+        <Route path="/callback" element={<CallbackPage />} />
         <Route
           path="/*"
           element={
