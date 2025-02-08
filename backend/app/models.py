@@ -1,7 +1,7 @@
 import uuid
 
 from pydantic import EmailStr
-from sqlmodel import Field, Enum, Relationship, SQLModel
+from sqlmodel import Field, Enum, Relationship, SQLModel, Column
 from datetime import datetime
 
 
@@ -59,7 +59,7 @@ class UsersPublic(SQLModel):
 
 
 # Shared properties
-class EmotionImpact(str, enum.Enum):
+class EmotionImpact(str, Enum):
     xtreme_sad = "Extremely Sad"
     sad = "Sad"
     meh = "Ambivalent"
@@ -69,7 +69,7 @@ class EmotionImpact(str, enum.Enum):
 class PMOTBase(SQLModel):
     label: str = Field(min_length=1, max_length=255)
     description: str | None = Field(default=None, max_length=255)
-    event_date: date = Field(default_factory=datetime.utcnow,nullable=False)
+    event_date: datetime = Field(default_factory=datetime.utcnow,nullable=False)
     short_story: str = Field(min_length=1, max_length=5500)
     emotional_impact: EmotionImpact = Field(sa_column = Column(Enum(EmotionImpact)))
     #show_on_jl: bool = False
@@ -99,7 +99,7 @@ class PMOT(PMOTBase, table=True):
 class PMOTDetails(SQLModel, table=True):
     pmot_id: uuid.UUID = Field(foreign_key="PMOT.id", nullable=False, ondelete="RESTRICT")
     det_story: str = Field(min_length=1, max_length=5500)
-    story_arc: StoryArc = # story arc obj 
+    #story_arc: StoryArc = # story arc obj 
     anchors : list[Anchor] = Relationship(back_populates="Anchor", 
                                           cascade_delete=False)
     empathy_matrix: EmpathyMatrix = empathy_mat_obj
