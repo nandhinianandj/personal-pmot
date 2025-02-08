@@ -5,7 +5,7 @@ from datetime import datetime
 from sqlmodel import Session, select
 
 from app.core.security import get_password_hash, verify_password
-from app.models import Item, ItemCreate, User, UserCreate, UserUpdate, PMOT, PMOTDetailsCreate, PMOTDetails, PMOTDetailsUpdate
+from app.models import ItemCreate, User, UserCreate, UserUpdate, PMOT, PMOTDetails 
 
 
 def create_user(*, session: Session, user_create: UserCreate) -> User:
