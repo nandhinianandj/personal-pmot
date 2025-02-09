@@ -45,7 +45,7 @@ class UpdatePassword(SQLModel):
 class User(UserBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     hashed_password: str
-    items: list["Item"] = Relationship(back_populates="owner", 
+    items: list["PMOT"] = Relationship(back_populates="owner", 
                                        cascade_delete=True)
 
 
@@ -103,8 +103,8 @@ class PMOTDetails(SQLModel, table=True):
     pmot_id: uuid.UUID = Field(foreign_key="PMOT.id", nullable=False, ondelete="RESTRICT")
     det_story: str = Field(min_length=1, max_length=5500)
     #story_arc: StoryArc = # story arc obj 
-    anchors : list[Anchor] = Relationship(back_populates="Anchor", 
-                                          cascade_delete=False)
+    #anchors : list[Anchor] = Relationship(back_populates="Anchor", 
+    #                                      cascade_delete=False)
     #empathy_matrix: EmpathyMatrix = empathy_mat_obj
     #strengths1: list[Strength] = list_of_strength_objs
 
@@ -117,7 +117,7 @@ class PMOTPublic(PMOTBase):
     owner_id: uuid.UUID
 
 
-class ItemsPublic(SQLModel):
+class PMOTsPublic(SQLModel):
     data: list[PMOTPublic]
     count: int
 
