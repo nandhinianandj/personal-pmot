@@ -78,6 +78,8 @@ class PMOTBase(SQLModel):
 class Anchor(SQLModel):
     pass
 
+class StoryArc(SQLModel):
+    pass
 # Properties to receive on item creation
 class PMOTCreate(PMOTBase):
     created_at: datetime = Field(default_factory=datetime.utcnow,nullable=False)
@@ -102,7 +104,8 @@ class PMOTDetails(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     pmot_id: uuid.UUID = Field(foreign_key="PMOT.id", nullable=False, ondelete="RESTRICT")
     det_story: str = Field(min_length=1, max_length=5500)
-    #story_arc: StoryArc = # story arc obj 
+    #story_arc: StoryArc = Relationship(back_populates="StoryArc", 
+                                          #cascade_delete=False)
     #anchors : list[Anchor] = Relationship(back_populates="Anchor", 
     #                                      cascade_delete=False)
     #empathy_matrix: EmpathyMatrix = empathy_mat_obj
