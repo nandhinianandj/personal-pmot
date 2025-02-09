@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException
 from sqlmodel import func, select
 
 from app.api.deps import CurrentUser, SessionDep
-from app.models import Item, ItemCreate, ItemPublic, ItemsPublic, ItemUpdate, Message
+from app.models import Item, PMOTCreate, ItemPublic, ItemsPublic, ItemUpdate, Message
 
 router = APIRouter()
 
@@ -56,7 +56,7 @@ def read_item(session: SessionDep, current_user: CurrentUser, id: uuid.UUID) -> 
 
 @router.post("/", response_model=ItemPublic)
 def create_item(
-    *, session: SessionDep, current_user: CurrentUser, item_in: ItemCreate
+    *, session: SessionDep, current_user: CurrentUser, item_in: PMOTCreate
 ) -> Any:
     """
     Create new item.

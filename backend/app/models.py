@@ -79,13 +79,14 @@ class Anchor(SQLModel):
     pass
 
 # Properties to receive on item creation
-class ItemCreate(PMOTBase):
+class PMOTCreate(PMOTBase):
     created_at: datetime = Field(default_factory=datetime.utcnow,nullable=False)
 
 
 # Properties to receive on item update
-class ItemUpdate(PMOTBase):
+class PMOTUpdate(PMOTBase):
     title: str | None = Field(default=None, min_length=1, max_length=255)  # type: ignore
+    updated_at: datetime = Field(default_factory=datetime.utcnow,nullable=False)
 
 
 # Database model, database table inferred from class name
@@ -107,6 +108,9 @@ class PMOTDetails(SQLModel, table=True):
     #empathy_matrix: EmpathyMatrix = empathy_mat_obj
     #strengths1: list[Strength] = list_of_strength_objs
 
+class PMOTDetailsUpdate(PMOTBase):
+    updated_at: datetime = Field(default_factory=datetime.utcnow,nullable=False)
+    
 # Properties to return via API, id is always required
 class PMOTPublic(PMOTBase):
     id: uuid.UUID
