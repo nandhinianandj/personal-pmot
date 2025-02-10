@@ -80,6 +80,7 @@ class Anchor(SQLModel):
 
 class StoryArc(SQLModel):
     pass
+
 # Properties to receive on item creation
 class PMOTCreate(PMOTBase):
     created_at: datetime = Field(default_factory=datetime.utcnow,nullable=False)
@@ -113,22 +114,19 @@ class PMOTDetails(SQLModel, table=True):
 
 class PMOTDetailsUpdate(PMOTBase):
     updated_at: datetime = Field(default_factory=datetime.utcnow,nullable=False)
-    
+
 # Properties to return via API, id is always required
 class PMOTPublic(PMOTBase):
     id: uuid.UUID
     owner_id: uuid.UUID
 
-
 class PMOTsPublic(SQLModel):
     data: list[PMOTPublic]
     count: int
 
-
 # Generic message
 class Message(SQLModel):
     message: str
-
 
 # JSON payload containing access token
 class Token(SQLModel):
