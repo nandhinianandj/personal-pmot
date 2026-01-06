@@ -5,7 +5,15 @@ from datetime import datetime
 from sqlmodel import Session, select
 
 from app.core.security import get_password_hash, verify_password
-from app.models import Item, ItemCreate, User, UserCreate, UserUpdate, PMOT, PMOTDetailsCreate, PMOTDetails, PMOTDetailsUpdate
+from app.models import (
+    Anchor,
+    AnchorCreate,
+    PMOT,
+    PMOTCreate,
+    User,
+    UserCreate,
+    UserUpdate,
+)
 
 
 def create_user(*, session: Session, user_create: UserCreate) -> User:
@@ -47,57 +55,18 @@ def authenticate(*, session: Session, email: str, password: str) -> User | None:
     return db_user
 
 
-def create_item(*, session: Session, item_in: ItemCreate, owner_id: uuid.UUID) -> Item:
-    db_item = Item.model_validate(item_in, update={"owner_id": owner_id})
-    session.add(db_item)
-    session.commit()
-    session.refresh(db_item)
-    return db_item
-
-def create_pmot(*, session: Session, pmot_in: ItemCreate, owner_id: uuid.UUID) -> PMOT:
+def create_pmot(*, session: Session, pmot_in: PMOTCreate, owner_id: uuid.UUID) -> PMOT:
     db_pmot = PMOT.model_validate(pmot_in, update={"owner_id": owner_id})
     session.add(db_pmot)
     session.commit()
     session.refresh(db_pmot)
     return db_pmot
 
-def create_pmot_details(
-    *,
-    session: Session,
-    pmot_id: uuid.UUID,
-    owner_id: uuid.UUID,
-    title: str,
-    description: str,
-    start_date: datetime,
-    end_date: datetime,
-    status: str,
-    priority: str
-) -> PMOTDetails:
-    db_pmot_details = PMOTDetails(
-        pmot_id=pmot_id,
-        owner_id=owner_id,
-        title=title,
-        description=description,
-        start_date=start_date,
-        end_date=end_date,
-        status=status,
-        priority=priority
-    )
-    session.add(db_pmot_details)
-    session.commit()
-    session.refresh(db_pmot_details)
-    return db_pmot_details
 
-def update_pmot_details(
-    *,
-    session: Session,
-    db_pmot_details: PMOTDetails,
-    pmot_details_in: PMOTDetailsUpdate
-) -> PMOTDetails:
-    update_data = pmot_details_in.model_dump(exclude_unset=True)
-    db_pmot_details.sqlmodel_update(update_data)
-    session.add(db_pmot_details)
+def create_anchor(*, session: Session, anchor_in: AnchorCreate) -> Anchor:
+    db_anchor = Anchor.model_validate(anchor_in)
+    session.add(db_anchor)
     session.commit()
-    session.refresh(db_pmot_details)
-    return db_pmot_details
+    session.refresh(db_anchor)
+    return db_anchor
 
