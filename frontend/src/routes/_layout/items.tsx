@@ -14,12 +14,13 @@ import {
 } from "@chakra-ui/react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { z } from "zod"
 
 import { ItemsService } from "../../client"
 import ActionsMenu from "../../components/Common/ActionsMenu"
 import Navbar from "../../components/Common/Navbar"
+import AddAnchor from "../../components/Items/AddAnchor"
 import AddItem from "../../components/Items/AddItem"
 
 const itemsSearchSchema = z.object({
@@ -42,6 +43,8 @@ function getItemsQueryOptions({ page }: { page: number }) {
 }
 
 function ItemsTable() {
+  const [isAnchorModalOpen, setIsAnchorModalOpen] = useState(false)
+  const [selectedPmotId, setSelectedPmotId] = useState<string | null>(null)
   const queryClient = useQueryClient()
   const { page } = Route.useSearch()
   const navigate = useNavigate({ from: Route.fullPath })
@@ -75,6 +78,7 @@ function ItemsTable() {
               <Th>ID</Th>
               <Th>Title</Th>
               <Th>Description</Th>
+              <Th>Anchor</Th>
               <Th>Actions</Th>
             </Tr>
           </Thead>
@@ -104,6 +108,17 @@ function ItemsTable() {
                     {item.description || "N/A"}
                   </Td>
                   <Td>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setSelectedPmotId(item.id)
+                        setIsAnchorModalOpen(true)
+                      }}
+                    >
+                      Add Anchor
+                    </Button>
+                  </Td>
+                  <Td>
                     <ActionsMenu type={"Item"} value={item} />
                   </Td>
                 </Tr>
@@ -127,6 +142,13 @@ function ItemsTable() {
           Next
         </Button>
       </Flex>
+      {selectedPmotId && (
+        <AddAnchor
+          isOpen={isAnchorModalOpen}
+          onClose={() => setIsAnchorModalOpen(false)}
+          pmotId={selectedPmotId}
+        />
+      )}
     </>
   )
 }

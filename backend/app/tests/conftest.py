@@ -1,23 +1,40 @@
 from collections.abc import Generator
 
 import pytest
+from dotenv import load_dotenv
 from fastapi.testclient import TestClient
-from sqlmodel import Session, delete
+from sqlmodel import Session, SQLModel, delete
 
+load_dotenv()
+from app import crud
 from app.core.config import settings
-from app.core.db import engine, init_db
+from app.core.db import engine
 from app.main import app
-from app.models import Item, User
+from app.models import PMOT, User, UserCreate
 from app.tests.utils.user import authentication_token_from_email
 from app.tests.utils.utils import get_superuser_token_headers
 
 
 @pytest.fixture(scope="session", autouse=True)
+def db_init() -> Generator[None, None, None]:
+    SQLModel.metadata.create_all(engine)
+    yield
+    SQLModel.metadata.drop_all(engine)
+
+
+@pytest.fixture(scope="session")
 def db() -> Generator[Session, None, None]:
     with Session(engine) as session:
-        init_db(session)
+        user = crud.get_user_by_email(session=session, email=settings.FIRST_SUPERUSER)
+        if not user:
+            user_in = UserCreate(
+                email=settings.FIRST_SUPERUSER,
+                password=settings.FIRST_SUPERUSER_PASSWORD,
+                is_superuser=True,
+            )
+            crud.create_user(session=session, user_create=user_in)
         yield session
-        statement = delete(Item)
+        statement = delete(PMOT)
         session.execute(statement)
         statement = delete(User)
         session.execute(statement)

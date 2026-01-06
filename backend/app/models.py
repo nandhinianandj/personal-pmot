@@ -40,12 +40,17 @@ class UpdatePassword(SQLModel):
     new_password: str = Field(min_length=8, max_length=40)
 
 
+import enum
+from datetime import date
+
+from sqlmodel import Column, Enum
+
+
 # Database model, database table inferred from class name
 class User(UserBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     hashed_password: str
-    items: list["Item"] = Relationship(back_populates="owner", 
-                                       cascade_delete=True)
+    pmots: list["PMOT"] = Relationship(back_populates="owner", cascade_delete=True)
 
 
 # Properties to return via API, id is always required
@@ -58,7 +63,6 @@ class UsersPublic(SQLModel):
     count: int
 
 
-# Shared properties
 class EmotionImpact(str, enum.Enum):
     xtreme_sad = "Extremely Sad"
     sad = "Sad"
@@ -66,44 +70,107 @@ class EmotionImpact(str, enum.Enum):
     happy = "Happy"
     xtreme_happy = "Extremely Happy"
 
-class PMOTBase(SQLModel):
-    label: str = Field(min_length=1, max_length=255)
-    description: str | None = Field(default=None, max_length=255)
-    event_date: date = Field(default_factory=datetime.utcnow,nullable=False)
-    short_story: str = Field(min_length=1, max_length=5500)
-    emotional_impact: EmotionImpact = Field(sa_column = Column(Enum(EmotionImpact)))
-    #show_on_jl: bool = False
 
-class Anchor(SQLModel):
+class AnchorType(str, enum.Enum):
+    text = "text"
+    image = "image"
+    audio = "audio"
+    video = "video"
+    file = "file"
+
+
+class StoryArc(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    name: str = Field(max_length=255)
+    description: str | None = Field(default=None, max_length=255)
+
+
+class EmpathyMatrix(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    name: str = Field(max_length=255)
+    description: str | None = Field(default=None, max_length=255)
+
+
+class PMOTDetailsStrengthLink(SQLModel, table=True):
+    pmot_details_id: uuid.UUID | None = Field(
+        default=None, foreign_key="pmotdetails.id", primary_key=True
+    )
+    strength_id: uuid.UUID | None = Field(
+        default=None, foreign_key="strength.id", primary_key=True
+    )
+
+
+class Strength(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    name: str = Field(max_length=255)
+    description: str | None = Field(default=None, max_length=255)
+    pmot_details: list["PMOTDetails"] = Relationship(
+        back_populates="strengths", link_model=PMOTDetailsStrengthLink
+    )
+
+
+class PMOTBase(SQLModel):
+    title: str = Field(min_length=1, max_length=255)
+    description: str | None = Field(default=None, max_length=255)
+    event_date: date = Field(default_factory=date.today, nullable=False)
+    short_story: str = Field(min_length=1, max_length=5500)
+    emotional_impact: EmotionImpact | None = Field(
+        default=None, sa_column=Column(Enum(EmotionImpact))
+    )
+
+
+class PMOTCreate(PMOTBase):
     pass
 
-# Properties to receive on item creation
-class ItemCreate(PMOTBase):
-    created_at: date = Field(default_factory=datetime.utcnow,nullable=False)
+
+class PMOTUpdate(PMOTBase):
+    pass
 
 
-# Properties to receive on item update
-class ItemUpdate(PMOTBase):
-    title: str | None = Field(default=None, min_length=1, max_length=255)  # type: ignore
+class AnchorBase(SQLModel):
+    anchor_type: AnchorType = Field(sa_column=Column(Enum(AnchorType)))
+    content: str
 
 
-# Database model, database table inferred from class name
+class AnchorCreate(AnchorBase):
+    pass
+
+
+class AnchorPublic(AnchorBase):
+    id: uuid.UUID
+
+
+class Anchor(AnchorBase, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    pmot_details_id: uuid.UUID = Field(foreign_key="pmotdetails.id")
+    pmot_details: "PMOTDetails" = Relationship(back_populates="anchors")
+
+
 class PMOT(PMOTBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    title: str = Field(max_length=255)
-    owner_id: uuid.UUID = Field(
-        foreign_key="user.id", nullable=False, ondelete="CASCADE"
+    owner_id: uuid.UUID = Field(foreign_key="user.id", nullable=False)
+    owner: User = Relationship(back_populates="pmots")
+    details: "PMOTDetails" = Relationship(
+        back_populates="pmot", sa_relationship_kwargs={"uselist": False}
     )
-    owner: User | None = Relationship(back_populates="items")
+
 
 class PMOTDetails(SQLModel, table=True):
-    pmot_id: uuid.UUID = Field(foreign_key="PMOT.id", nullable=False, ondelete="RESTRICT")
-    det_story: str = Field(min_length=1, max_length=5500)
-    story_arc: StoryArc = # story arc obj 
-    anchors : list[Anchor] = Relationship(back_populates="Anchor", 
-                                          cascade_delete=False)
-    empathy_matrix: EmpathyMatrix = empathy_mat_obj
-    strengths1: list[Strength] = list_of_strength_objs
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    pmot_id: uuid.UUID = Field(foreign_key="pmot.id")
+    pmot: PMOT = Relationship(back_populates="details")
+    det_story: str | None = Field(default=None, min_length=1, max_length=5500)
+    story_arc_id: uuid.UUID | None = Field(default=None, foreign_key="storyarc.id")
+    story_arc: StoryArc | None = Relationship()
+    empathy_matrix_id: uuid.UUID | None = Field(
+        default=None, foreign_key="empathymatrix.id"
+    )
+    empathy_matrix: EmpathyMatrix | None = Relationship()
+    strengths: list[Strength] = Relationship(
+        back_populates="pmot_details", link_model=PMOTDetailsStrengthLink
+    )
+    anchors: list[Anchor] = Relationship(back_populates="pmot_details")
+
 
 # Properties to return via API, id is always required
 class PMOTPublic(PMOTBase):
@@ -111,7 +178,7 @@ class PMOTPublic(PMOTBase):
     owner_id: uuid.UUID
 
 
-class ItemsPublic(SQLModel):
+class PMOTsPublic(SQLModel):
     data: list[PMOTPublic]
     count: int
 
